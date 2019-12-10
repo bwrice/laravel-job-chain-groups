@@ -1,18 +1,30 @@
 {
     "name": "bwrice/laravel-job-chain-groups",
     "description": "Chain groups of jobs that can be dispatched asynchronously before the next job in the chain is queued",
+    "keywords": [
+        "bwrice",
+        "laravel-job-chain-groups"
+    ],
     "type": "library",
     "license": "MIT",
     "authors": [
         {
             "name": "Brian Rice",
-            "email": "bwrice83@gmail.com"
+            "email": "bwrice83@gmail.com",
+            "role": "Developer"
         }
     ],
-    "require": {},
+    "require": {
+        "php": "^7.2",
+        "illuminate/support": "^6.0"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "^8.5",
+        "orchestra/testbench": "^4.0"
+    },
     "autoload": {
         "psr-4": {
-            "Bwrice\\LaravelJobChainGroups\\": "src/"
+            "Bwrice\\LaravelJobChainGroups\\": "src"
         }
     },
     "autoload-dev": {
@@ -20,8 +32,22 @@
             "Bwrice\\LaravelJobChainGroups\\Tests\\": "tests"
         }
     },
-    "require-dev": {
-        "phpunit/phpunit": "^8.5",
-        "orchestra/testbench": "^4.0"
+    "scripts": {
+        "test": "vendor/bin/phpunit",
+        "test-coverage": "vendor/bin/phpunit --coverage-html coverage"
+
+    },
+    "config": {
+        "sort-packages": true
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "Bwrice\\LaravelJobChainGroups\\LaravelJobChainGroupsServiceProvider"
+            ],
+            "aliases": {
+                "LaravelJobChainGroups": "Bwrice\\LaravelJobChainGroups\\LaravelJobChainGroupsFacade"
+            }
+        }
     }
 }
