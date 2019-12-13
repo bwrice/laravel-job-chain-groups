@@ -2,7 +2,7 @@
 
 namespace Bwrice\LaravelJobChainGroups;
 
-class LaravelJobChainGroups
+class JobChainGroups
 {
     // Build your next great package.
 }

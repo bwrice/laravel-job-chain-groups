@@ -4,7 +4,7 @@ namespace Bwrice\LaravelJobChainGroups;
 
 use Illuminate\Support\ServiceProvider;
 
-class LaravelJobChainGroupsServiceProvider extends ServiceProvider
+class JobChainGroupsServiceProvider extends ServiceProvider
 {
     /**
      * Bootstrap the application services.
@@ -54,7 +54,7 @@ class LaravelJobChainGroupsServiceProvider extends ServiceProvider
 
         // Register the main class to use with the facade
         $this->app->singleton('laravel-job-chain-groups', function () {
-            return new LaravelJobChainGroups;
+            return new JobChainGroups;
         });
     }
 }
