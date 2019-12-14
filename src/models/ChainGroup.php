@@ -13,10 +13,10 @@ use Illuminate\Database\Eloquent\Model;
  *
  * @property Collection $children
  */
-class ParentJob extends Model
+class ChainGroup extends Model
 {
     public function children()
     {
-        return $this->hasMany(ChildJob::class);
+        return $this->hasMany(ChainGroupMember::class);
     }
 }

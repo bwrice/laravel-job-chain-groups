@@ -10,12 +10,12 @@ use Illuminate\Database\Eloquent\Model;
  * Class ChildJob
  * @package Bwrice\LaravelJobChainGroups\models
  *
- * @property ParentJob $parent
+ * @property ChainGroup $parent
  */
-class ChildJob extends Model
+class ChainGroupMember extends Model
 {
     public function parent()
     {
-        return $this->belongsTo(ParentJob::class);
+        return $this->belongsTo(ChainGroup::class);
     }
 }
