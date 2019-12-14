@@ -42,6 +42,12 @@ class JobChainGroupsServiceProvider extends ServiceProvider
             // Registering package commands.
             // $this->commands([]);
         }
+
+        if (! class_exists('CreateChainGroupMembersTable')) {
+            $this->publishes([
+                __DIR__.'/../stubs/create_chain_group_members_table.stub.php' => database_path('migrations/'.date('Y_m_d_His', time()).'_create_chain_group_members_table.php'),
+            ], 'migrations');
+        }
     }
 
     /**
