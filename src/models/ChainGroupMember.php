@@ -10,12 +10,12 @@ use Illuminate\Database\Eloquent\Model;
  * Class ChildJob
  * @package Bwrice\LaravelJobChainGroups\models
  *
- * @property ChainGroup $parent
+ * @property int $id
+ * @property string $group_uuid
  */
 class ChainGroupMember extends Model
 {
-    public function parent()
-    {
-        return $this->belongsTo(ChainGroup::class);
-    }
+    protected $guarded = [];
+
+    public $table = 'chain_group_members';
 }
