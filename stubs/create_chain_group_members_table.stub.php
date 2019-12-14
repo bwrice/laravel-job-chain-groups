@@ -12,6 +12,7 @@ final class CreateChainGroupMembersTable extends Migration
             $table->bigIncrements('id');
             $table->uuid('group_uuid');
             $table->dateTime('finalized_at')->nullable();
+            $table->timestamps();
         });
     }
 }
