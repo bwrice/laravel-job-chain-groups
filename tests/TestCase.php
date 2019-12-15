@@ -15,7 +15,7 @@ abstract class TestCase extends Orchestra
 
     protected function setUpDatabase()
     {
-        Schema::dropIfExists('stored_events');
+        Schema::dropIfExists('chain_group_members');
         include_once __DIR__.'/../stubs/create_chain_group_members_table.stub.php';
         (new \CreateChainGroupMembersTable())->up();
     }
