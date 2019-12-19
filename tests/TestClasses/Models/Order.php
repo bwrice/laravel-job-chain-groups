@@ -12,7 +12,6 @@ use Illuminate\Database\Eloquent\Model;
  * @package Bwrice\LaravelJobChainGroups\Tests\TestClasses\Models
  *
  * @property int $id
- * @property string $uuid
  * @property CarbonInterface $preprocessed_at
  * @property CarbonInterface $shipped_at
  */
