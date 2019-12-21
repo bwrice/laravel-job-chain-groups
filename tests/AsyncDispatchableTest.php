@@ -5,6 +5,7 @@ namespace Bwrice\LaravelJobChainGroups\Tests;
 
 
 use Bwrice\LaravelJobChainGroups\jobs\AsyncChainedJob;
+use Bwrice\LaravelJobChainGroups\models\ChainGroupMember;
 use Bwrice\LaravelJobChainGroups\Tests\TestClasses\Jobs\ProcessOrderItem;
 use Bwrice\LaravelJobChainGroups\Tests\TestClasses\Models\Order;
 use Bwrice\LaravelJobChainGroups\Tests\TestClasses\Models\OrderItem;
@@ -16,21 +17,44 @@ use Illuminate\Support\Str;
 
 class AsyncDispatchableTest extends TestCase
 {
+    /** @var OrderItem */
+    protected $orderItem;
+
+    public function setUp(): void
+    {
+        parent::setUp();
+
+        $this->orderItem = OrderItem::create([
+            'order_id' => Order::create()->id
+        ]);
+
+    }
+
     /**
     * @test
     */
     public function it_will_queue_correctly()
     {
-        $orderItem = OrderItem::create([
-            'order_id' => Order::create()->id
-        ]);
-
         Queue::fake();
 
-        ProcessOrderItem::dispatchAsync(Str::uuid(), $orderItem);
+        ProcessOrderItem::dispatchAsync(Str::uuid(), $this->orderItem);
 
-        Queue::assertPushed(AsyncChainedJob::class, function (AsyncChainedJob $chainedJob) use ($orderItem) {
-            return $chainedJob->getJob()->orderItem->id === $orderItem->id;
+        Queue::assertPushed(AsyncChainedJob::class, function (AsyncChainedJob $chainedJob) {
+            return $chainedJob->getJob()->orderItem->id === $this->orderItem->id;
         });
+    }
+
+    /**
+    * @test
+    */
+    public function it_will_create_a_chain_group_member_in_the_db()
+    {
+        Queue::fake();
+
+        $groupUuid = Str::uuid();
+        ProcessOrderItem::dispatchAsync($groupUuid, $this->orderItem);
+
+        $chainGroupMember = ChainGroupMember::query()->where('group_uuid', '=', $groupUuid)->first();
+        $this->assertNotNull($chainGroupMember);
     }
 }
