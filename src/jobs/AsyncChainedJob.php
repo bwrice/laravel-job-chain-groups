@@ -22,8 +22,9 @@ class AsyncChainedJob implements ShouldQueue
     /** @var string */
     protected $groupUuid;
 
-    public function __construct($job)
+    public function __construct(string $groupUuid, $job)
     {
+        $this->groupUuid = $groupUuid;
         $this->job = $job;
     }
 

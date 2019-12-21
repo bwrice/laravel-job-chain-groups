@@ -24,7 +24,7 @@ class AsyncDispatchableTest extends TestCase
 
         Queue::fake();
 
-        PreProcessOrder::dispatchAsync($order);
+        PreProcessOrder::dispatchAsync(Str::uuid(), $order);
 
         Queue::assertPushed(AsyncChainedJob::class, function (AsyncChainedJob $chainedJob) use ($order) {
             return $chainedJob->getJob()->order->id === $order->id;

@@ -8,8 +8,8 @@ use Bwrice\LaravelJobChainGroups\jobs\AsyncChainedJob;
 
 trait AsyncChainable
 {
-    public static function dispatchAsync()
+    public static function dispatchAsync(string $groupUuid, ...$jobArgs)
     {
-        return AsyncChainedJob::dispatch(new static(...func_get_args()));
+        return AsyncChainedJob::dispatch($groupUuid, new static(...$jobArgs));
     }
 }
