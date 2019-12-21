@@ -22,7 +22,6 @@ abstract class TestCase extends Orchestra
         Schema::dropIfExists('orders');
         Schema::create('orders', function (Blueprint $table) {
             $table->increments('id');
-            $table->uuid('uuid');
             $table->dateTime('preprocessed_at')->nullable();
             $table->dateTime('shipped_at')->nullable();
             $table->timestamps();
@@ -31,7 +30,6 @@ abstract class TestCase extends Orchestra
         Schema::dropIfExists('order_items');
         Schema::create('order_items', function (Blueprint $table) {
             $table->increments('id');
-            $table->uuid('uuid');
             $table->integer('order_id')->unsigned();
             $table->dateTime('processed_at')->nullable();
             $table->timestamps();
