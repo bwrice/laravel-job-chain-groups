@@ -11,7 +11,7 @@ final class CreateChainGroupMembersTable extends Migration
         Schema::create('chain_group_members', function (Blueprint $table) {
             $table->bigIncrements('id');
             $table->uuid('group_uuid');
-            $table->dateTime('finalized_at')->nullable();
+            $table->dateTime('processed_at')->nullable();
             $table->timestamps();
         });
     }
