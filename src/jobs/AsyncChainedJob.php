@@ -38,12 +38,12 @@ class AsyncChainedJob implements ShouldQueue
     }
 
     /**
-     * @param string $jobID
+     * @param string $groupUuid
      * @return AsyncChainedJob
      */
-    public function setJobID(string $jobID): AsyncChainedJob
+    public function setGroupUuid(string $groupUuid): AsyncChainedJob
     {
-        $this->jobID = $jobID;
+        $this->groupUuid = $groupUuid;
         return $this;
     }
 
