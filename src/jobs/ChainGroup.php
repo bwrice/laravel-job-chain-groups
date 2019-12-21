@@ -28,7 +28,7 @@ class ChainGroup
     protected function setUuids()
     {
         $this->groupMembers->each(function (AsyncChainedJob $chainGroupMemberJob) {
-            $chainGroupMemberJob->setGroupUuid($this->uuid);
+            $chainGroupMemberJob->setJobID($this->uuid);
         });
     }
 

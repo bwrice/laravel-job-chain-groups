@@ -19,11 +19,15 @@ class AsyncChainedJob implements ShouldQueue
     /** @var mixed */
     protected $job;
 
+    /** @var int */
+    protected $jobID;
+
     /** @var string */
     protected $groupUuid;
 
-    public function __construct(string $groupUuid, $job)
+    public function __construct(int $jobID, string $groupUuid, $job)
     {
+        $this->jobID = $jobID;
         $this->groupUuid = $groupUuid;
         $this->job = $job;
     }
@@ -31,19 +35,15 @@ class AsyncChainedJob implements ShouldQueue
     public function handle(Container $container)
     {
         $container->call([$this->job, 'handle']);
-
-        ChainGroupMember::query()->create([
-            'group_uuid' => $this->groupUuid
-        ]);
     }
 
     /**
-     * @param string $groupUuid
+     * @param string $jobID
      * @return AsyncChainedJob
      */
-    public function setGroupUuid(string $groupUuid): AsyncChainedJob
+    public function setJobID(string $jobID): AsyncChainedJob
     {
-        $this->groupUuid = $groupUuid;
+        $this->jobID = $jobID;
         return $this;
     }
 
