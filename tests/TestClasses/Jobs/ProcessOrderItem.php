@@ -6,24 +6,25 @@ namespace Bwrice\LaravelJobChainGroups\Tests\TestClasses\Jobs;
 
 use Bwrice\LaravelJobChainGroups\jobs\AsyncChainedJob;
 use Bwrice\LaravelJobChainGroups\Tests\TestClasses\Models\Order;
+use Bwrice\LaravelJobChainGroups\Tests\TestClasses\Models\OrderItem;
 use Bwrice\LaravelJobChainGroups\traits\AsyncChainable;
 use Illuminate\Support\Facades\Date;
 
-class PreProcessOrder
+class ProcessOrderItem
 {
     use AsyncChainable;
 
-    /** @var Order */
-    public  $order;
+    /** @var OrderItem */
+    public  $orderItem;
 
-    public function __construct(Order $order)
+    public function __construct(OrderItem $orderItem)
     {
-        $this->order = $order;
+        $this->orderItem = $orderItem;
     }
 
     public function handle()
     {
-        $this->order->preprocessed_at = Date::now();
-        $this->order->save();
+        $this->orderItem->processed_at = Date::now();
+        $this->orderItem->save();
     }
 }
