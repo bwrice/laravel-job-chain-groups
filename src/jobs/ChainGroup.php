@@ -3,12 +3,19 @@
 
 namespace Bwrice\LaravelJobChainGroups\jobs;
 
+use Illuminate\Bus\Queueable;
+use Illuminate\Contracts\Queue\ShouldQueue;
+use Illuminate\Foundation\Bus\Dispatchable;
+use Illuminate\Queue\InteractsWithQueue;
+use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
 use Ramsey\Uuid\UuidInterface;
 
-class ChainGroup
+class ChainGroup implements ShouldQueue
 {
+    use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
+
     /**
      * @var UuidInterface
      */
@@ -22,13 +29,13 @@ class ChainGroup
     {
         $this->uuid = Str::uuid();
         $this->setGroupMembers($groupMembers);
-        $this->setUuids();
+        $this->validateGroupMembers();
     }
 
-    protected function setUuids()
+    public function handle()
     {
         $this->groupMembers->each(function (AsyncChainedJob $chainGroupMemberJob) {
-            $chainGroupMemberJob->setJobID($this->uuid);
+            $chainGroupMemberJob->setGroupUuid($this->uuid);
         });
     }
 
@@ -46,6 +53,15 @@ class ChainGroup
             $this->groupMembers = $groupMembers;
         }
         throw new \InvalidArgumentException("groupMembers must be an array or instance of " . Collection::class);
+    }
+
+    protected function validateGroupMembers()
+    {
+        $this->groupMembers->each(function ($groupMember) {
+            if (! $groupMember instanceof AsyncChainedJob) {
+                throw new \InvalidArgumentException("group member must be in instance of " . AsyncChainedJob::class);
+            }
+        });
     }
 
 }
