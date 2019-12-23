@@ -1,7 +1,7 @@
 <?php
 
 
-namespace Bwrice\LaravelJobChainGroups\jobs;
+namespace Bwrice\LaravelJobChainGroups\jobsOld;
 
 use Bwrice\LaravelJobChainGroups\models\ChainGroupMember;
 use Illuminate\Bus\Queueable;
@@ -23,12 +23,11 @@ class AsyncChainedJob implements ShouldQueue
     protected $jobID;
 
     /** @var string */
-    protected $groupUuid;
+    protected $groupUuid = '';
 
-    public function __construct(int $jobID, string $groupUuid, $job)
+    public function __construct(int $jobID, $job)
     {
         $this->jobID = $jobID;
-        $this->groupUuid = $groupUuid;
         $this->job = $job;
     }
 

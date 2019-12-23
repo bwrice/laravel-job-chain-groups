@@ -1,12 +1,14 @@
 <?php
 
 
-namespace Bwrice\LaravelJobChainGroups\jobs;
+namespace Bwrice\LaravelJobChainGroups\jobsOld;
 
 use Illuminate\Bus\Queueable;
+use Illuminate\Contracts\Bus\Dispatcher;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
+use Illuminate\Queue\Queue;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
@@ -35,7 +37,7 @@ class ChainGroup implements ShouldQueue
     public function handle()
     {
         $this->groupMembers->each(function (AsyncChainedJob $chainGroupMemberJob) {
-            $chainGroupMemberJob->setGroupUuid($this->uuid);
+            app(Dispatcher::class)->dispatch($chainGroupMemberJob->setGroupUuid($this->uuid));
         });
     }
 
