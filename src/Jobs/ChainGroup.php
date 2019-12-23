@@ -1,7 +1,7 @@
 <?php
 
 
-namespace Bwrice\LaravelJobChainGroups\jobsOld;
+namespace Bwrice\LaravelJobChainGroups\Jobs;
 
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Bus\Dispatcher;

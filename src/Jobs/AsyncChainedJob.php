@@ -1,7 +1,7 @@
 <?php
 
 
-namespace Bwrice\LaravelJobChainGroups\jobsOld;
+namespace Bwrice\LaravelJobChainGroups\Jobs;
 
 use Bwrice\LaravelJobChainGroups\models\ChainGroupMember;
 use Illuminate\Bus\Queueable;
