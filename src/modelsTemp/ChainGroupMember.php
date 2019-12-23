@@ -1,7 +1,7 @@
 <?php
 
 
-namespace Bwrice\LaravelJobChainGroups\models;
+namespace Bwrice\LaravelJobChainGroups\modelsTemp;
 
 
 use Illuminate\Database\Eloquent\Model;

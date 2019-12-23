@@ -1,11 +1,11 @@
 <?php
 
 
-namespace Bwrice\LaravelJobChainGroups\traits;
+namespace Bwrice\LaravelJobChainGroups\traitsTemp;
 
 
-use Bwrice\LaravelJobChainGroups\jobs\AsyncChainedJob;
-use Bwrice\LaravelJobChainGroups\models\ChainGroupMember;
+use Bwrice\LaravelJobChainGroups\Jobs\AsyncChainedJob;
+use Bwrice\LaravelJobChainGroups\modelsTemp\ChainGroupMember;
 
 trait AsyncChainable
 {
