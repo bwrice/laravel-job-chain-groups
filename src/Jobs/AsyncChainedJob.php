@@ -4,6 +4,7 @@
 namespace Bwrice\LaravelJobChainGroups\Jobs;
 
 use Bwrice\LaravelJobChainGroups\Models\ChainGroupMember;
+use Illuminate\Bus\Dispatcher;
 use Illuminate\Bus\Queueable;
 use Illuminate\Container\Container;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -17,19 +18,20 @@ class AsyncChainedJob implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
+    /** @var string */
+    protected $groupMemberUuid;
+
     /** @var mixed */
-    public $decoratedJob;
+    protected $decoratedJob;
 
-    /** @var string */
-    public $groupMemberUuid;
+    /** @var mixed */
+    protected $nextJob;
 
-    /** @var string */
-    public $groupUuid = '';
-
-    public function __construct(string $groupMemberUuid, $decoratedJob)
+    public function __construct(string $groupMemberUuid, $decoratedJob, $nextJob)
     {
         $this->groupMemberUuid = $groupMemberUuid;
         $this->decoratedJob = $decoratedJob;
+        $this->nextJob = $nextJob;
     }
 
     public function handle(Container $container)
@@ -40,6 +42,10 @@ class AsyncChainedJob implements ShouldQueue
 
         $chainGroupMember->processed_at = Date::now();
         $chainGroupMember->save();
+
+        if (ChainGroupMember::unprocessedForGroup($chainGroupMember->group_uuid)->count() > 0) {
+            app(Dispatcher::class)->dispatch($this->nextJob);
+        }
     }
 
     /**
