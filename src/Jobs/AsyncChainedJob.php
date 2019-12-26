@@ -10,6 +10,7 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
+use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Str;
 
 class AsyncChainedJob implements ShouldQueue
@@ -20,20 +21,25 @@ class AsyncChainedJob implements ShouldQueue
     public $decoratedJob;
 
     /** @var string */
-    public $jobUuid;
+    public $groupMemberUuid;
 
     /** @var string */
     public $groupUuid = '';
 
-    public function __construct(string $jobUuid, $decoratedJob)
+    public function __construct(string $groupMemberUuid, $decoratedJob)
     {
-        $this->jobUuid = $jobUuid;
+        $this->groupMemberUuid = $groupMemberUuid;
         $this->decoratedJob = $decoratedJob;
     }
 
     public function handle(Container $container)
     {
+        /** @var ChainGroupMember $chainGroupMember */
+        $chainGroupMember = ChainGroupMember::query()->findOrFail($this->groupMemberUuid);
         $container->call([$this->decoratedJob, 'handle']);
+
+        $chainGroupMember->processed_at = Date::now();
+        $chainGroupMember->save();
     }
 
     /**
