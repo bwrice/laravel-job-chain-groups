@@ -43,7 +43,7 @@ class AsyncChainedJob implements ShouldQueue
         $chainGroupMember->processed_at = Date::now();
         $chainGroupMember->save();
 
-        if (ChainGroupMember::unprocessedForGroup($chainGroupMember->group_uuid)->count() > 0) {
+        if (ChainGroupMember::unprocessedForGroup($chainGroupMember->group_uuid)->count() === 0) {
             app(Dispatcher::class)->dispatch($this->nextJob);
         }
     }
