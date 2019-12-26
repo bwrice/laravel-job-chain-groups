@@ -4,15 +4,14 @@
 namespace Bwrice\LaravelJobChainGroups\Jobs;
 
 use Bwrice\LaravelJobChainGroups\Models\ChainGroupMember;
-use Illuminate\Bus\Dispatcher;
 use Illuminate\Bus\Queueable;
 use Illuminate\Container\Container;
+use Illuminate\Contracts\Bus\Dispatcher;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\Date;
-use Illuminate\Support\Str;
 
 class AsyncChainedJob implements ShouldQueue
 {
