@@ -39,8 +39,8 @@ class AsyncDispatchableTest extends TestCase
 
         ProcessOrderItem::dispatchAsync(Str::uuid(), $this->orderItem);
 
-        Queue::assertPushed(ProcessOrderItem::class, function (ProcessOrderItem $job) {
-            return $job->orderItem->id === $this->orderItem->id;
+        Queue::assertPushed(AsyncChainedJob::class, function (AsyncChainedJob $job) {
+            return $job->getDecoratedJob()->orderItem->id === $this->orderItem->id;
         });
     }
 
