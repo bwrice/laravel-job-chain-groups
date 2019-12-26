@@ -107,4 +107,31 @@ class AsyncChainedJobTest extends TestCase
             return $job->order->id === $this->order->id;
         });
     }
+
+    /**
+    * @test
+    */
+    public function it_will_NOT_dispatch_the_next_job_if_there_are_members_of_the_group_unprocessed()
+    {
+        ChainGroupMember::query()->create([
+            'uuid' => Str::uuid(),
+            'group_uuid' => $this->groupUuid
+        ]);
+
+        Queue::fake();
+
+        $asyncChainedJob = new AsyncChainedJob($this->groupMemberUuid, $this->decoratedJob, $this->nextJob);
+
+        app(Container::class)->call([$asyncChainedJob, 'handle']);
+
+        $unprocessedCount = ChainGroupMember::query()
+            ->where('group_uuid', $this->groupUuid)
+            ->whereNull('processed_at')->count();
+
+        $this->assertEquals(1, $unprocessedCount);
+
+        Queue::assertNotPushed(ShipOrder::class, function (ShipOrder $job) {
+            return $job->order->id === $this->order->id;
+        });
+    }
 }
