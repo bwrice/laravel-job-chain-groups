@@ -49,20 +49,26 @@ class AsyncChainedJob implements ShouldQueue
     }
 
     /**
-     * @param string $groupUuid
-     * @return AsyncChainedJob
-     */
-    public function setGroupUuid(string $groupUuid): AsyncChainedJob
-    {
-        $this->groupUuid = $groupUuid;
-        return $this;
-    }
-
-    /**
      * @return mixed
      */
     public function getDecoratedJob()
     {
         return $this->decoratedJob;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getNextJob()
+    {
+        return $this->nextJob;
+    }
+
+    /**
+     * @return string
+     */
+    public function getGroupMemberUuid(): string
+    {
+        return $this->groupMemberUuid;
     }
 }
