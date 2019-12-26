@@ -6,6 +6,11 @@ namespace Bwrice\LaravelJobChainGroups\Tests;
 
 use Bwrice\LaravelJobChainGroups\Jobs\AsyncChainedJob;
 use Bwrice\LaravelJobChainGroups\Models\ChainGroupMember;
+use Bwrice\LaravelJobChainGroups\Tests\TestClasses\Jobs\ProcessOrderItem;
+use Bwrice\LaravelJobChainGroups\Tests\TestClasses\Jobs\ShipOrder;
+use Bwrice\LaravelJobChainGroups\Tests\TestClasses\Models\Order;
+use Bwrice\LaravelJobChainGroups\Tests\TestClasses\Models\OrderItem;
+use Illuminate\Container\Container;
 use Illuminate\Support\Str;
 
 class AsyncChainedJobTest extends TestCase
@@ -19,7 +24,17 @@ class AsyncChainedJobTest extends TestCase
     /** @var ChainGroupMember */
     public $chainGroupMember;
 
+    /** @var ProcessOrderItem */
     public $decoratedJob;
+
+    /** @var ShipOrder */
+    public $nextJob;
+
+    /** @var Order */
+    public $order;
+
+    /** @var OrderItem */
+    public $orderItem;
 
     public function setUp(): void
     {
@@ -32,12 +47,14 @@ class AsyncChainedJobTest extends TestCase
             'group_uuid' => $this->groupUuid
         ]);
 
-        $this->decoratedJob = new class {
+        $this->order = Order::query()->create();
 
-            public function handle() {
+        $this->orderItem = OrderItem::query()->create([
+            'order_id' => Order::query()->create()->id
+        ]);
 
-            }
-        };
+        $this->decoratedJob = new ProcessOrderItem($this->orderItem);
+        $this->nextJob = new ShipOrder($this->order);
     }
 
     /**
@@ -45,7 +62,9 @@ class AsyncChainedJobTest extends TestCase
     */
     public function it_will_set_the_processed_at_column_on_the_chain_group_member()
     {
-        AsyncChainedJob::dispatchNow($this->groupMemberUuid, $this->decoratedJob);
+        $asyncChainedJob = new AsyncChainedJob($this->groupMemberUuid, $this->decoratedJob, $this->nextJob);
+
+        app(Container::class)->call([$asyncChainedJob, 'handle']);
 
         $chainGroupMember = ChainGroupMember::query()->find($this->groupMemberUuid);
         $this->assertNotNull($chainGroupMember);
