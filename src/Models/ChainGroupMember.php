@@ -4,6 +4,7 @@
 namespace Bwrice\LaravelJobChainGroups\Models;
 
 
+use Carbon\CarbonInterface;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 
@@ -11,20 +12,22 @@ use Illuminate\Database\Eloquent\Model;
  * Class ChildJob
  * @package Bwrice\LaravelJobChainGroups\models
  *
- * @property int $id
+ * @property string $uuid
  * @property string $group_uuid
+ * @property CarbonInterface $processed_at
  *
- * @method static Builder groupUuid(string $groupUuid)
+ * @method static Builder unprocessedForGroup(string $groupUuid)
  */
 class ChainGroupMember extends Model
 {
     protected $primaryKey = 'uuid';
     protected $guarded = [];
+    protected $dates = ['processed_at'];
 
     public $table = 'chain_group_members';
 
-    public function scopeGroupUuid(Builder $builder, string $groupUuid)
+    public function scopeUnprocessedForGroup(Builder $builder, string $groupUuid)
     {
-        return $builder->where('group_uuid', '=', $groupUuid);
+        return $builder->where('group_uuid', '=', $groupUuid)->whereNull('processed_at');
     }
 }
