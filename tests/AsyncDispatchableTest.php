@@ -4,8 +4,8 @@
 namespace Bwrice\LaravelJobChainGroups\Tests;
 
 
-use Bwrice\LaravelJobChainGroups\jobs\AsyncChainedJob;
-use Bwrice\LaravelJobChainGroups\models\ChainGroupMember;
+use Bwrice\LaravelJobChainGroups\Jobs\AsyncChainedJob;
+use Bwrice\LaravelJobChainGroups\Models\ChainGroupMember;
 use Bwrice\LaravelJobChainGroups\Tests\TestClasses\Jobs\ProcessOrderItem;
 use Bwrice\LaravelJobChainGroups\Tests\TestClasses\Models\Order;
 use Bwrice\LaravelJobChainGroups\Tests\TestClasses\Models\OrderItem;
@@ -39,8 +39,8 @@ class AsyncDispatchableTest extends TestCase
 
         ProcessOrderItem::dispatchAsync(Str::uuid(), $this->orderItem);
 
-        Queue::assertPushed(AsyncChainedJob::class, function (AsyncChainedJob $chainedJob) {
-            return $chainedJob->getJob()->orderItem->id === $this->orderItem->id;
+        Queue::assertPushed(ProcessOrderItem::class, function (ProcessOrderItem $job) {
+            return $job->orderItem->id === $this->orderItem->id;
         });
     }
 
