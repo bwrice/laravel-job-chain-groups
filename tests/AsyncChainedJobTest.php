@@ -85,4 +85,26 @@ class AsyncChainedJobTest extends TestCase
         $this->assertNotNull($chainGroupMember);
         $this->assertNotNull($chainGroupMember->processed_at);
     }
+
+    /**
+    * @test
+    */
+    public function it_will_dispatch_the_next_job_if_all_members_of_the_group_are_processed()
+    {
+        Queue::fake();
+
+        $asyncChainedJob = new AsyncChainedJob($this->groupMemberUuid, $this->decoratedJob, $this->nextJob);
+
+        app(Container::class)->call([$asyncChainedJob, 'handle']);
+
+        $unprocessedCount = ChainGroupMember::query()
+            ->where('group_uuid', $this->groupUuid)
+            ->whereNull('processed_at')->count();
+
+        $this->assertEquals(0, $unprocessedCount);
+
+        Queue::assertPushed(ShipOrder::class, function (ShipOrder $job) {
+            return $job->order->id === $this->order->id;
+        });
+    }
 }
