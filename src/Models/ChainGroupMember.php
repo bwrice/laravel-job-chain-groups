@@ -15,6 +15,7 @@ use Illuminate\Database\Eloquent\Model;
  */
 class ChainGroupMember extends Model
 {
+    protected $primaryKey = 'uuid';
     protected $guarded = [];
 
     public $table = 'chain_group_members';
