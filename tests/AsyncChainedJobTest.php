@@ -11,6 +11,7 @@ use Bwrice\LaravelJobChainGroups\Tests\TestClasses\Jobs\ShipOrder;
 use Bwrice\LaravelJobChainGroups\Tests\TestClasses\Models\Order;
 use Bwrice\LaravelJobChainGroups\Tests\TestClasses\Models\OrderItem;
 use Illuminate\Container\Container;
+use Illuminate\Support\Facades\Queue;
 use Illuminate\Support\Str;
 
 class AsyncChainedJobTest extends TestCase
@@ -55,6 +56,20 @@ class AsyncChainedJobTest extends TestCase
 
         $this->decoratedJob = new ProcessOrderItem($this->orderItem);
         $this->nextJob = new ShipOrder($this->order);
+    }
+
+    /**
+    * @test
+    */
+    public function it_will_push_to_the_queue()
+    {
+        Queue::fake();
+
+        AsyncChainedJob::dispatch($this->groupMemberUuid, $this->decoratedJob, $this->nextJob);
+
+        Queue::assertPushed(AsyncChainedJob::class, function (AsyncChainedJob $job) {
+            return $job->getGroupMemberUuid() === $this->groupMemberUuid;
+        });
     }
 
     /**
