@@ -3,6 +3,7 @@
 
 namespace Bwrice\LaravelJobChainGroups\Jobs;
 
+use Bwrice\LaravelJobChainGroups\Bus\PendingGroupDispatch;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Bus\Dispatcher;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -14,56 +15,38 @@ use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
 use Ramsey\Uuid\UuidInterface;
 
-class ChainGroup implements ShouldQueue
+class ChainGroup
 {
-    use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
     /**
-     * @var UuidInterface
+     * @var string
      */
-    protected $uuid;
+    protected $groupUuid;
     /**
      * @var Collection
      */
-    protected $groupMembers;
+    protected $pendingGroupDispatches;
 
-    public function __construct($groupMembers = [])
+    protected function __construct(string $groupUuid, Collection $pendingGroupDispatches)
     {
-        $this->uuid = Str::uuid();
-        $this->setGroupMembers($groupMembers);
-        $this->validateGroupMembers();
+        $this->groupUuid = $groupUuid;
+        $this->pendingGroupDispatches = $pendingGroupDispatches;
     }
 
-    public function handle()
+    /**
+     * @param array $asyncJobs
+     * @param $nextJob
+     * @return static
+     */
+    public static function create(array $asyncJobs, $nextJob)
     {
-        $this->groupMembers->each(function (AsyncChainedJob $chainGroupMemberJob) {
-            app(Dispatcher::class)->dispatch($chainGroupMemberJob->setGroupUuid($this->uuid));
+        $groupUuid = Str::uuid();
+        $pendingGroupDispatches = collect($asyncJobs)->map(function ($asyncJob) use ($nextJob, $groupUuid) {
+            $asyncChainedJob = new AsyncChainedJob($groupUuid, $asyncJob, $nextJob);
+            $jobUuid = Str::uuid();
+            return new PendingGroupDispatch($jobUuid, $groupUuid, $asyncChainedJob);
         });
-    }
-
-    public static function create($groupMembers = [])
-    {
-        return new static($groupMembers);
-    }
-
-    public function setGroupMembers($groupMembers = [])
-    {
-        if (is_array($groupMembers)) {
-            $this->groupMembers = collect($groupMembers);
-        }
-        if ($groupMembers instanceof Collection) {
-            $this->groupMembers = $groupMembers;
-        }
-        throw new \InvalidArgumentException("groupMembers must be an array or instance of " . Collection::class);
-    }
-
-    protected function validateGroupMembers()
-    {
-        $this->groupMembers->each(function ($groupMember) {
-            if (! $groupMember instanceof AsyncChainedJob) {
-                throw new \InvalidArgumentException("group member must be in instance of " . AsyncChainedJob::class);
-            }
-        });
+        return new static($groupUuid, $pendingGroupDispatches);
     }
 
 }
