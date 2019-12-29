@@ -42,9 +42,9 @@ class ChainGroup
     {
         $groupUuid = Str::uuid();
         $pendingGroupDispatches = collect($asyncJobs)->map(function ($asyncJob) use ($nextJob, $groupUuid) {
-            $asyncChainedJob = new AsyncChainedJob($groupUuid, $asyncJob, $nextJob);
-            $jobUuid = Str::uuid();
-            return new PendingGroupDispatch($jobUuid, $groupUuid, $asyncChainedJob);
+            $groupMemberUuid = Str::uuid();
+            $asyncChainedJob = new AsyncChainedJob($groupMemberUuid, $groupUuid, $asyncJob);
+            return (new PendingGroupDispatch($groupMemberUuid, $groupUuid, $asyncChainedJob))->chain((array) $nextJob);
         });
         return new static($groupUuid, $pendingGroupDispatches);
     }

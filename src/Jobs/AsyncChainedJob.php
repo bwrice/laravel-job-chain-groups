@@ -20,12 +20,16 @@ class AsyncChainedJob implements ShouldQueue
     /** @var string */
     protected $groupMemberUuid;
 
+    /** @var string */
+    protected $groupUuid;
+
     /** @var mixed */
     protected $decoratedJob;
 
-    public function __construct(string $groupMemberUuid, $decoratedJob)
+    public function __construct(string $groupMemberUuid, string $groupUuid, $decoratedJob)
     {
         $this->groupMemberUuid = $groupMemberUuid;
+        $this->groupUuid = $groupUuid;
         $this->decoratedJob = $decoratedJob;
     }
 
@@ -40,20 +44,29 @@ class AsyncChainedJob implements ShouldQueue
     }
 
     /**
-     * @return mixed
-     */
-    public function getDecoratedJob()
-    {
-        return $this->decoratedJob;
-    }
-    
-    /**
      * @return string
      */
     public function getGroupMemberUuid(): string
     {
         return $this->groupMemberUuid;
     }
+
+    /**
+     * @return string
+     */
+    public function getGroupUuid(): string
+    {
+        return $this->groupUuid;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getDecoratedJob()
+    {
+        return $this->decoratedJob;
+    }
+
 
     public function __call($method, $arguments)
     {
