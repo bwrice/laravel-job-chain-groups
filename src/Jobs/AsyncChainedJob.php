@@ -23,14 +23,10 @@ class AsyncChainedJob implements ShouldQueue
     /** @var mixed */
     protected $decoratedJob;
 
-    /** @var mixed */
-    protected $nextJob;
-
-    public function __construct(string $groupMemberUuid, $decoratedJob, $nextJob)
+    public function __construct(string $groupMemberUuid, $decoratedJob)
     {
         $this->groupMemberUuid = $groupMemberUuid;
         $this->decoratedJob = $decoratedJob;
-        $this->nextJob = $nextJob;
     }
 
     public function handle(Container $container)
@@ -41,10 +37,6 @@ class AsyncChainedJob implements ShouldQueue
 
         $chainGroupMember->processed_at = Date::now();
         $chainGroupMember->save();
-
-        if (ChainGroupMember::unprocessedForGroup($chainGroupMember->group_uuid)->count() === 0) {
-            app(Dispatcher::class)->dispatch($this->nextJob);
-        }
     }
 
     /**
@@ -54,15 +46,7 @@ class AsyncChainedJob implements ShouldQueue
     {
         return $this->decoratedJob;
     }
-
-    /**
-     * @return mixed
-     */
-    public function getNextJob()
-    {
-        return $this->nextJob;
-    }
-
+    
     /**
      * @return string
      */
