@@ -70,4 +70,9 @@ class AsyncChainedJob implements ShouldQueue
     {
         return $this->groupMemberUuid;
     }
+
+    public function __call($method, $arguments)
+    {
+        return $this->decoratedJob->$method(...$arguments);
+    }
 }
