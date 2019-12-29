@@ -16,19 +16,19 @@ class PendingGroupDispatch extends PendingDispatch
     /**
      * @var string
      */
-    protected $jobUuid;
+    protected $groupMemberUuid;
 
-    public function __construct(string $jobUuid, string $groupUuid, $job)
+    public function __construct(string $groupMemberUuid, string $groupUuid, $job)
     {
         parent::__construct($job);
-        $this->jobUuid = $jobUuid;
+        $this->groupMemberUuid = $groupMemberUuid;
         $this->groupUuid = $groupUuid;
     }
 
     public function __destruct()
     {
         ChainGroupMember::query()->create([
-            'uuid' => $this->jobUuid,
+            'uuid' => $this->groupMemberUuid,
             'group_uuid' => $this->groupUuid
         ]);
         parent::__destruct();
