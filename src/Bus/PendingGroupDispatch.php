@@ -33,4 +33,20 @@ class PendingGroupDispatch extends PendingDispatch
         ]);
         parent::__destruct();
     }
+
+    /**
+     * @return string
+     */
+    public function getGroupUuid(): string
+    {
+        return $this->groupUuid;
+    }
+
+    /**
+     * @return string
+     */
+    public function getGroupMemberUuid(): string
+    {
+        return $this->groupMemberUuid;
+    }
 }
