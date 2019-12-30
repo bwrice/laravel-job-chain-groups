@@ -20,6 +20,7 @@ use Illuminate\Database\Eloquent\Model;
  */
 class ChainGroupMember extends Model
 {
+    public $incrementing = false;
     protected $primaryKey = 'uuid';
     protected $guarded = [];
     protected $dates = ['processed_at'];
