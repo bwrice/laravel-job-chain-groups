@@ -69,7 +69,7 @@ class AsyncChainedJobTest extends TestCase
     {
         Queue::fake();
 
-        AsyncChainedJob::dispatch($this->groupMemberUuid, $this->decoratedJob, $this->nextJob);
+        AsyncChainedJob::dispatch($this->groupMemberUuid, $this->groupUuid, $this->decoratedJob);
 
         Queue::assertPushed(AsyncChainedJob::class, function (AsyncChainedJob $job) {
             return $job->getGroupMemberUuid() === $this->groupMemberUuid;
@@ -81,7 +81,7 @@ class AsyncChainedJobTest extends TestCase
     */
     public function it_will_set_the_processed_at_column_on_the_chain_group_member()
     {
-        $asyncChainedJob = new AsyncChainedJob($this->groupMemberUuid, $this->decoratedJob, $this->nextJob);
+        $asyncChainedJob = new AsyncChainedJob($this->groupMemberUuid, $this->groupUuid, $this->decoratedJob);
 
         app(Container::class)->call([$asyncChainedJob, 'handle']);
 
