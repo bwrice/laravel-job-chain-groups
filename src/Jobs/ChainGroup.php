@@ -4,16 +4,8 @@
 namespace Bwrice\LaravelJobChainGroups\Jobs;
 
 use Bwrice\LaravelJobChainGroups\Bus\PendingGroupDispatch;
-use Illuminate\Bus\Queueable;
-use Illuminate\Contracts\Bus\Dispatcher;
-use Illuminate\Contracts\Queue\ShouldQueue;
-use Illuminate\Foundation\Bus\Dispatchable;
-use Illuminate\Queue\InteractsWithQueue;
-use Illuminate\Queue\Queue;
-use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
-use Ramsey\Uuid\UuidInterface;
 
 class ChainGroup
 {
@@ -47,6 +39,13 @@ class ChainGroup
             return (new PendingGroupDispatch($groupMemberUuid, $groupUuid, $asyncChainedJob))->chain((array) $nextJob);
         });
         return new static($groupUuid, $pendingGroupDispatches);
+    }
+
+    public function __call($method, $arguments)
+    {
+        $this->pendingGroupDispatches->each(function (PendingGroupDispatch $pendingGroupDispatch) use ($method, $arguments) {
+            $pendingGroupDispatch->$method(...$arguments);
+        });
     }
 
 }
