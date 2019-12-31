@@ -11,11 +11,15 @@ use Bwrice\LaravelJobChainGroups\Tests\TestClasses\Jobs\ShipOrder;
 use Bwrice\LaravelJobChainGroups\Tests\TestClasses\Models\Order;
 use Bwrice\LaravelJobChainGroups\Tests\TestClasses\Models\OrderItem;
 use Illuminate\Container\Container;
+use Illuminate\Foundation\Testing\DatabaseTransactions;
+use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Facades\Queue;
 use Illuminate\Support\Str;
 
 class AsyncChainedJobTest extends TestCase
 {
+    use DatabaseTransactions;
+
     /** @var string */
     public $groupMemberUuid;
 
@@ -91,11 +95,16 @@ class AsyncChainedJobTest extends TestCase
     */
     public function it_will_dispatch_the_next_job_if_all_members_of_the_group_are_processed()
     {
+        $this->chainGroupMember->processed_at = Date::now();
+        $this->chainGroupMember->save();
+
         Queue::fake();
 
-        $asyncChainedJob = new AsyncChainedJob($this->groupMemberUuid, $this->decoratedJob, $this->nextJob);
+        $asyncChainedJob = (new AsyncChainedJob($this->groupMemberUuid, $this->groupUuid, $this->decoratedJob))->chain([
+            $this->nextJob
+        ]);
 
-        app(Container::class)->call([$asyncChainedJob, 'handle']);
+        $asyncChainedJob->dispatchNextJobInChain();
 
         $unprocessedCount = ChainGroupMember::query()
             ->where('group_uuid', $this->groupUuid)
@@ -120,9 +129,14 @@ class AsyncChainedJobTest extends TestCase
 
         Queue::fake();
 
-        $asyncChainedJob = new AsyncChainedJob($this->groupMemberUuid, $this->decoratedJob, $this->nextJob);
+        $this->chainGroupMember->processed_at = Date::now();
+        $this->chainGroupMember->save();
 
-        app(Container::class)->call([$asyncChainedJob, 'handle']);
+        $asyncChainedJob = (new AsyncChainedJob($this->groupMemberUuid, $this->groupUuid, $this->decoratedJob))->chain([
+            $this->nextJob
+        ]);
+
+        $asyncChainedJob->dispatchNextJobInChain();
 
         $unprocessedCount = ChainGroupMember::query()
             ->where('group_uuid', $this->groupUuid)
