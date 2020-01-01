@@ -53,7 +53,9 @@ class ChainGroupTest extends TestCase
             new ProcessOrderItem($this->itemOne),
             new ProcessOrderItem($this->itemTwo),
             new ProcessOrderItem($this->itemThree)
-        ], new ShipOrder($this->order));
+        ], [
+            new ShipOrder($this->order)
+        ]);
 
         Queue::assertPushed(AsyncChainedJob::class, 3);
 
@@ -63,6 +65,35 @@ class ChainGroupTest extends TestCase
             $this->itemThree
                 ] as $item) {
             Queue::assertPushed(AsyncChainedJob::class, function (AsyncChainedJob $asyncChainedJob) use ($item) {
+                return $asyncChainedJob->getDecoratedJob()->orderItem->id === $item->id;
+            });
+        }
+    }
+
+    /**
+    * @test
+    */
+    public function it_will_chain_a_single_job()
+    {
+        Queue::fake();
+
+        $shipOrderJob = new ShipOrder($this->order);
+        ChainGroup::create([
+            new ProcessOrderItem($this->itemOne),
+            new ProcessOrderItem($this->itemTwo),
+            new ProcessOrderItem($this->itemThree)
+        ], [
+            $shipOrderJob
+        ]);
+
+        foreach([
+                    $this->itemOne,
+                    $this->itemTwo,
+                    $this->itemThree
+                ] as $item) {
+            Queue::assertPushedWithChain(AsyncChainedJob::class, [
+                $shipOrderJob
+            ], function (AsyncChainedJob $asyncChainedJob) use ($item) {
                 return $asyncChainedJob->getDecoratedJob()->orderItem->id === $item->id;
             });
         }
