@@ -30,13 +30,13 @@ class ChainGroup
      * @param $chain
      * @return static
      */
-    public static function create(array $asyncJobs, $chain)
+    public static function create(array $asyncJobs, array $chain)
     {
         $groupUuid = Str::uuid();
         $pendingGroupDispatches = collect($asyncJobs)->map(function ($asyncJob) use ($chain, $groupUuid) {
             $groupMemberUuid = Str::uuid();
             $asyncChainedJob = new AsyncChainedJob($groupMemberUuid, $groupUuid, $asyncJob);
-            return (new PendingGroupDispatch($groupMemberUuid, $groupUuid, $asyncChainedJob))->chain((array) $chain);
+            return (new PendingGroupDispatch($groupMemberUuid, $groupUuid, $asyncChainedJob))->chain($chain);
         });
         return new static($groupUuid, $pendingGroupDispatches);
     }
