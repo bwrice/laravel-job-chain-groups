@@ -27,16 +27,16 @@ class ChainGroup
 
     /**
      * @param array $asyncJobs
-     * @param $nextJob
+     * @param $chain
      * @return static
      */
-    public static function create(array $asyncJobs, $nextJob)
+    public static function create(array $asyncJobs, $chain)
     {
         $groupUuid = Str::uuid();
-        $pendingGroupDispatches = collect($asyncJobs)->map(function ($asyncJob) use ($nextJob, $groupUuid) {
+        $pendingGroupDispatches = collect($asyncJobs)->map(function ($asyncJob) use ($chain, $groupUuid) {
             $groupMemberUuid = Str::uuid();
             $asyncChainedJob = new AsyncChainedJob($groupMemberUuid, $groupUuid, $asyncJob);
-            return (new PendingGroupDispatch($groupMemberUuid, $groupUuid, $asyncChainedJob))->chain((array) $nextJob);
+            return (new PendingGroupDispatch($groupMemberUuid, $groupUuid, $asyncChainedJob))->chain((array) $chain);
         });
         return new static($groupUuid, $pendingGroupDispatches);
     }
