@@ -4,10 +4,8 @@
 namespace Bwrice\LaravelJobChainGroups\Tests\TestClasses\Jobs;
 
 
-use Bwrice\LaravelJobChainGroups\jobs\AsyncChainedJob;
-use Bwrice\LaravelJobChainGroups\Tests\TestClasses\Models\Order;
 use Bwrice\LaravelJobChainGroups\Tests\TestClasses\Models\OrderItem;
-use Bwrice\LaravelJobChainGroups\traits\AsyncChainable;
+use Bwrice\LaravelJobChainGroups\Traits\AsyncChainable;
 use Illuminate\Support\Facades\Date;
 
 class ProcessOrderItem

@@ -19,7 +19,7 @@ class ShipOrder implements ShouldQueue
     /**
      * @var Order
      */
-    protected $order;
+    public $order;
 
     public function __construct(Order $order)
     {
