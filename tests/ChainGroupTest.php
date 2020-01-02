@@ -45,7 +45,7 @@ class ChainGroupTest extends TestCase
     /**
     * @test
     */
-    public function it_will_dispatch_the_jobs_with_chains()
+    public function it_will_queue_the_jobs_with_chains()
     {
         Queue::fake();
 
@@ -69,5 +69,22 @@ class ChainGroupTest extends TestCase
                 return $asyncChainedJob->getDecoratedJob()->orderItem->id === $item->id;
             });
         }
+    }
+
+    /**
+    * @test
+    */
+    public function it_can_define_a_specific_queue()
+    {
+        Queue::fake();
+
+        $shipOrderJob = new ShipOrder($this->order);
+        ChainGroup::create([
+            new ProcessOrderItem($this->itemOne),
+        ], [
+            $shipOrderJob
+        ])->onQueue('testbench');
+
+        Queue::assertPushedOn('testbench', AsyncChainedJob::class);
     }
 }
