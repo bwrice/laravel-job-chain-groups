@@ -19,15 +19,15 @@ abstract class TestCase extends Orchestra
         /*
          * Test Schema
          */
+        Schema::dropIfExists('order_items');
         Schema::dropIfExists('orders');
+
         Schema::create('orders', function (Blueprint $table) {
             $table->increments('id');
             $table->dateTime('preprocessed_at')->nullable();
             $table->dateTime('shipped_at')->nullable();
             $table->timestamps();
         });
-
-        Schema::dropIfExists('order_items');
         Schema::create('order_items', function (Blueprint $table) {
             $table->increments('id');
             $table->integer('order_id')->unsigned();
