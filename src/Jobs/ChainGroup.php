@@ -46,6 +46,8 @@ class ChainGroup
         $this->pendingGroupDispatches->each(function (PendingGroupDispatch $pendingGroupDispatch) use ($method, $arguments) {
             $pendingGroupDispatch->$method(...$arguments);
         });
+        
+        return $this;
     }
 
 }
