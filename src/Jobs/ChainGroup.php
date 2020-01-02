@@ -4,9 +4,16 @@
 namespace Bwrice\LaravelJobChainGroups\Jobs;
 
 use Bwrice\LaravelJobChainGroups\Bus\PendingGroupDispatch;
+use Illuminate\Foundation\Bus\PendingDispatch;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
 
+/**
+ * Class ChainGroup
+ * @package Bwrice\LaravelJobChainGroups\Jobs
+ *
+ * @mixin PendingDispatch
+ */
 class ChainGroup
 {
 
