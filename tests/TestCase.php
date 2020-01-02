@@ -45,5 +45,20 @@ abstract class TestCase extends Orchestra
         Schema::dropIfExists('chain_group_members');
         include_once __DIR__.'/../stubs/create_chain_group_members_table.stub.php';
         (new \CreateChainGroupMembersTable())->up();
+
+
+        /*
+         * Jobs table for queue
+         */
+        Schema::dropIfExists('jobs');
+        Schema::create('jobs', function (Blueprint $table) {
+            $table->bigIncrements('id');
+            $table->string('queue')->index();
+            $table->longText('payload');
+            $table->unsignedTinyInteger('attempts');
+            $table->unsignedInteger('reserved_at')->nullable();
+            $table->unsignedInteger('available_at');
+            $table->unsignedInteger('created_at');
+        });
     }
 }
