@@ -43,10 +43,10 @@
     "extra": {
         "laravel": {
             "providers": [
-                "Bwrice\\LaravelJobChainGroups\\LaravelJobChainGroupsServiceProvider"
+                "Bwrice\\LaravelJobChainGroups\\JobChainGroupsServiceProvider"
             ],
             "aliases": {
-                "LaravelJobChainGroups": "Bwrice\\LaravelJobChainGroups\\LaravelJobChainGroupsFacade"
+                "LaravelJobChainGroups": "Bwrice\\LaravelJobChainGroups\\JobChainGroupsFacade"
             }
         }
     }
