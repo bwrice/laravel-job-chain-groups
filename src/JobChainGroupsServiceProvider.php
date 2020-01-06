@@ -56,11 +56,11 @@ class JobChainGroupsServiceProvider extends ServiceProvider
     public function register()
     {
         // Automatically apply the package configuration
-        $this->mergeConfigFrom(__DIR__.'/../config/config.php', 'laravel-job-chain-groups');
-
-        // Register the main class to use with the facade
-        $this->app->singleton('laravel-job-chain-groups', function () {
-            return new JobChainGroups;
-        });
+//        $this->mergeConfigFrom(__DIR__.'/../config/config.php', 'laravel-job-chain-groups');
+//
+//        // Register the main class to use with the facade
+//        $this->app->singleton('laravel-job-chain-groups', function () {
+//            return new JobChainGroups;
+//        });
     }
 }
