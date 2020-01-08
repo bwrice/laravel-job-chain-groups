@@ -48,13 +48,19 @@ class ChainGroup
         return new static($groupUuid, $pendingGroupDispatches);
     }
 
+    public function push($job)
+    {
+        $groupMemberUuid = Str::uuid();
+        $asyncJob = new AsyncChainedJob($groupMemberUuid, $this->groupUuid, $job);
+        $this->pendingGroupDispatches->push($asyncJob);
+    }
+
     public function __call($method, $arguments)
     {
         $this->pendingGroupDispatches->each(function (PendingGroupDispatch $pendingGroupDispatch) use ($method, $arguments) {
             $pendingGroupDispatch->$method(...$arguments);
         });
-        
+
         return $this;
     }
-
 }
