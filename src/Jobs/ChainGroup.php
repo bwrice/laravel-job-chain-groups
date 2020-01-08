@@ -16,51 +16,98 @@ use Illuminate\Support\Str;
  */
 class ChainGroup
 {
-
     /**
      * @var string
      */
     protected $groupUuid;
     /**
-     * @var Collection
+     * @var array
      */
-    protected $pendingGroupDispatches;
+    protected $jobs;
+    /**
+     * @var array
+     */
+    protected $chain;
 
-    protected function __construct(string $groupUuid, Collection $pendingGroupDispatches)
+    /** @var Collection */
+    protected $methodCalls;
+
+    public function __construct(array $jobs, array $chain)
     {
-        $this->groupUuid = $groupUuid;
-        $this->pendingGroupDispatches = $pendingGroupDispatches;
+        $this->groupUuid = Str::uuid();
+        $this->methodCalls = collect();
+        $this->jobs = collect($jobs);
+        $this->chain = $chain;
     }
 
-    /**
-     * @param array $asyncJobs
-     * @param $chain
-     * @return static
-     */
-    public static function create(array $asyncJobs, array $chain)
+    public static function create(array $jobs, array $chain)
     {
-        $groupUuid = Str::uuid();
-        $pendingGroupDispatches = collect($asyncJobs)->map(function ($asyncJob) use ($chain, $groupUuid) {
+        return new static($jobs, $chain);
+    }
+
+    public function dispatch()
+    {
+        $this->jobs->map(function ($job) {
             $groupMemberUuid = Str::uuid();
-            $asyncChainedJob = new AsyncChainedJob($groupMemberUuid, $groupUuid, $asyncJob);
-            return (new PendingGroupDispatch($groupMemberUuid, $groupUuid, $asyncChainedJob))->chain($chain);
+            $asyncChainedJob = new AsyncChainedJob($groupMemberUuid, $this->groupUuid, $job);
+            return (new PendingGroupDispatch($groupMemberUuid, $this->groupUuid, $asyncChainedJob))->chain($this->chain);
+        })->each(function (PendingGroupDispatch $dispatch) {
+            $this->methodCalls->each(function ($methodCall) use ($dispatch) {
+                $dispatch->$methodCall['method'](...$methodCall['arguments']);
+            });
         });
-        return new static($groupUuid, $pendingGroupDispatches);
     }
 
     public function push($job)
     {
-        $groupMemberUuid = Str::uuid();
-        $asyncJob = new AsyncChainedJob($groupMemberUuid, $this->groupUuid, $job);
-        $this->pendingGroupDispatches->push($asyncJob);
+        $this->jobs->push($job);
+        return $this;
     }
 
     public function __call($method, $arguments)
     {
-        $this->pendingGroupDispatches->each(function (PendingGroupDispatch $pendingGroupDispatch) use ($method, $arguments) {
-            $pendingGroupDispatch->$method(...$arguments);
-        });
+        $this->methodCalls->push([
+            'method' => $method,
+            'arguments' => $arguments
+        ]);
+        return $this;
+    }
 
+    /**
+     * @return string
+     */
+    public function getGroupUuid(): string
+    {
+        return $this->groupUuid;
+    }
+
+    /**
+     * @return array
+     */
+    public function getJobs(): array
+    {
+        return $this->jobs;
+    }
+
+    /**
+     * @return array
+     */
+    public function getChain(): array
+    {
+        return $this->chain;
+    }
+
+    /**
+     * @param array $jobs
+     * @return ChainGroup
+     */
+    public function setJobs($jobs): ChainGroup
+    {
+        if ($jobs instanceof Collection) {
+            $this->jobs = $jobs;
+        } else {
+            $this->jobs = collect($jobs);
+        }
         return $this;
     }
 }
