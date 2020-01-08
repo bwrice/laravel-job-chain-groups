@@ -56,7 +56,7 @@ class ChainGroupTest extends TestCase
             new ProcessOrderItem($this->itemThree)
         ], [
             $shipOrderJob
-        ]);
+        ])->dispatch();
 
         foreach([
                     $this->itemOne,
@@ -83,7 +83,7 @@ class ChainGroupTest extends TestCase
             new ProcessOrderItem($this->itemOne),
         ], [
             $shipOrderJob
-        ])->onQueue('testbench');
+        ])->onQueue('testbench')->dispatch();
 
         Queue::assertPushedOn('testbench', AsyncChainedJob::class);
     }
