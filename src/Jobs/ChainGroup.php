@@ -53,7 +53,7 @@ class ChainGroup
             return (new PendingGroupDispatch($groupMemberUuid, $this->groupUuid, $asyncChainedJob))->chain($this->chain);
         })->each(function (PendingGroupDispatch $dispatch) {
             $this->methodCalls->each(function ($methodCall) use ($dispatch) {
-                $dispatch->$methodCall['method'](...$methodCall['arguments']);
+                $dispatch->{$methodCall['method']}(...$methodCall['arguments']);
             });
         });
     }
