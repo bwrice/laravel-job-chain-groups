@@ -66,7 +66,7 @@ class ChainGroup
 
     public function merge($jobs)
     {
-        $this->jobs->merge($jobs);
+        $this->jobs = $this->jobs->merge($jobs);
         return $this;
     }
 
