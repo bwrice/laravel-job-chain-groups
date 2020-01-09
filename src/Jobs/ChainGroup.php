@@ -64,6 +64,12 @@ class ChainGroup
         return $this;
     }
 
+    public function merge($jobs)
+    {
+        $this->jobs->merge($jobs);
+        return $this;
+    }
+
     public function __call($method, $arguments)
     {
         $this->methodCalls->push([
