@@ -1,3 +1,9 @@
+---
+
+**This package is still in development and not recommended for production use!**
+
+---
+
 # Dispatch a chain of jobs after a group of asynchronous jobs
 
 [![Latest Version on Packagist](https://img.shields.io/packagist/v/bwrice/laravel-job-chain-groups.svg?style=flat-square)](https://packagist.org/packages/bwrice/laravel-job-chain-groups)
