@@ -1,8 +1,5 @@
----
 
-**This package is still in development and not recommended for production use!**
-
----
+#### This package is still in development and not recommended for production use!
 
 # Dispatch a chain of jobs after a group of asynchronous jobs
 
