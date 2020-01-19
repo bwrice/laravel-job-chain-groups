@@ -5,12 +5,10 @@ namespace Bwrice\LaravelJobChainGroups\Tests\TestClasses\Jobs;
 
 
 use Bwrice\LaravelJobChainGroups\Tests\TestClasses\Models\OrderItem;
-use Bwrice\LaravelJobChainGroups\Traits\AsyncChainable;
 use Illuminate\Support\Facades\Date;
 
 class ProcessOrderItem
 {
-    use AsyncChainable;
 
     /** @var OrderItem */
     public  $orderItem;
