@@ -1,11 +1,14 @@
-# Very short description of the package
+# Dispatch a chain of jobs after a group of asynchronous jobs
 
 [![Latest Version on Packagist](https://img.shields.io/packagist/v/bwrice/laravel-job-chain-groups.svg?style=flat-square)](https://packagist.org/packages/bwrice/laravel-job-chain-groups)
 [![Build Status](https://img.shields.io/travis/bwrice/laravel-job-chain-groups/master.svg?style=flat-square)](https://travis-ci.org/bwrice/laravel-job-chain-groups)
 [![Quality Score](https://img.shields.io/scrutinizer/g/bwrice/laravel-job-chain-groups.svg?style=flat-square)](https://scrutinizer-ci.com/g/bwrice/laravel-job-chain-groups)
 [![Total Downloads](https://img.shields.io/packagist/dt/bwrice/laravel-job-chain-groups.svg?style=flat-square)](https://packagist.org/packages/bwrice/laravel-job-chain-groups)
 
-This is where your description should go. Try and limit it to a paragraph or two, and maybe throw in a mention of what PSRs you support to avoid any confusion with users and contributors.
+Imagine you have monthly subscriptions and every month you need to process those subscriptions and immediately after processing them,
+you want to generate a subscriptions report. You create a ProcessSubscription job and a GenerateSubscriptionReport job, but the only way to guarantee
+the GenerateSubscriptionReport job runs after all the ProcessSubscription jobs are finished is to chain all of the ProcessSubscription jobs
+concurrently and then chain the GenerateSubscriptionReport job on the end.
 
 ## Installation
 
