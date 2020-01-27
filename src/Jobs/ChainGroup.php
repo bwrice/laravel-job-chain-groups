@@ -32,15 +32,21 @@ class ChainGroup
     /** @var Collection */
     protected $methodCalls;
 
-    public function __construct(array $jobs, array $chain)
+    public function __construct($jobs, array $chain)
     {
+        if (is_array($jobs)) {
+            $this->jobs = collect($jobs);
+        } elseif ($jobs instanceof Collection) {
+            $this->jobs = $jobs;
+        } else {
+            throw new \InvalidArgumentException("jobs must be an array or instance of " . Collection::class);
+        }
         $this->groupUuid = Str::uuid();
         $this->methodCalls = collect();
-        $this->jobs = collect($jobs);
         $this->chain = $chain;
     }
 
-    public static function create(array $jobs, array $chain)
+    public static function create($jobs, array $chain)
     {
         return new static($jobs, $chain);
     }
