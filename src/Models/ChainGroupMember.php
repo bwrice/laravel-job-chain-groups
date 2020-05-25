@@ -23,7 +23,11 @@ class ChainGroupMember extends Model
     public $incrementing = false;
     protected $primaryKey = 'uuid';
     protected $guarded = [];
-    protected $dates = ['processed_at'];
+    protected $dates = [
+        'processed_at',
+        'created_at',
+        'updated_at'
+    ];
 
     public $table = 'chain_group_members';
 
