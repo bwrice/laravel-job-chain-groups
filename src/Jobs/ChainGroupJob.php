@@ -3,7 +3,7 @@
 
 namespace Bwrice\LaravelJobChainGroups\Jobs;
 
-use Bwrice\LaravelJobChainGroups\Bus\PendingGroupDispatch;
+use Bwrice\LaravelJobChainGroups\Bus\PendingChainGroupMemberDispatch;
 use Illuminate\Foundation\Bus\PendingDispatch;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
@@ -56,8 +56,8 @@ class ChainGroup
         $this->jobs->map(function ($job) {
             $groupMemberUuid = Str::uuid();
             $asyncChainedJob = new AsyncChainedJob($groupMemberUuid, $this->groupUuid, $job);
-            return (new PendingGroupDispatch($groupMemberUuid, $this->groupUuid, $asyncChainedJob))->chain($this->chain);
-        })->each(function (PendingGroupDispatch $dispatch) {
+            return (new PendingChainGroupMemberDispatch($groupMemberUuid, $this->groupUuid, $asyncChainedJob))->chain($this->chain);
+        })->each(function (PendingChainGroupMemberDispatch $dispatch) {
             $this->methodCalls->each(function ($methodCall) use ($dispatch) {
                 $dispatch->{$methodCall['method']}(...$methodCall['arguments']);
             });
