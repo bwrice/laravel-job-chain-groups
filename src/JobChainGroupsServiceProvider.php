@@ -20,29 +20,29 @@ class JobChainGroupsServiceProvider extends ServiceProvider
         // $this->loadMigrationsFrom(__DIR__.'/../database/migrations');
         // $this->loadRoutesFrom(__DIR__.'/routes.php');
 
-        if ($this->app->runningInConsole()) {
-            $this->publishes([
-                __DIR__.'/../config/config.php' => config_path('laravel-job-chain-groups.php'),
-            ], 'config');
-
-            // Publishing the views.
-            /*$this->publishes([
-                __DIR__.'/../resources/views' => resource_path('views/vendor/laravel-job-chain-groups'),
-            ], 'views');*/
-
-            // Publishing assets.
-            /*$this->publishes([
-                __DIR__.'/../resources/assets' => public_path('vendor/laravel-job-chain-groups'),
-            ], 'assets');*/
-
-            // Publishing the translation files.
-            /*$this->publishes([
-                __DIR__.'/../resources/lang' => resource_path('lang/vendor/laravel-job-chain-groups'),
-            ], 'lang');*/
-
-            // Registering package commands.
-            // $this->commands([]);
-        }
+//        if ($this->app->runningInConsole()) {
+//            $this->publishes([
+//                __DIR__.'/../config/config.php' => config_path('laravel-job-chain-groups.php'),
+//            ], 'config');
+//
+//            // Publishing the views.
+//            /*$this->publishes([
+//                __DIR__.'/../resources/views' => resource_path('views/vendor/laravel-job-chain-groups'),
+//            ], 'views');*/
+//
+//            // Publishing assets.
+//            /*$this->publishes([
+//                __DIR__.'/../resources/assets' => public_path('vendor/laravel-job-chain-groups'),
+//            ], 'assets');*/
+//
+//            // Publishing the translation files.
+//            /*$this->publishes([
+//                __DIR__.'/../resources/lang' => resource_path('lang/vendor/laravel-job-chain-groups'),
+//            ], 'lang');*/
+//
+//            // Registering package commands.
+//            // $this->commands([]);
+//        }
 
         if (! class_exists('CreateChainGroupsTable') && ! class_exists('CreateChainGroupMembersTable')) {
             $this->publishes([
