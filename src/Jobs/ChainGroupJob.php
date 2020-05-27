@@ -3,7 +3,8 @@
 
 namespace Bwrice\LaravelJobChainGroups\Jobs;
 
-use Bwrice\LaravelJobChainGroups\Bus\PendingChainGroupMemberDispatch;
+use Bwrice\LaravelJobChainGroups\Models\ChainGroup;
+use Bwrice\LaravelJobChainGroups\Models\ChainGroupMember;
 use Illuminate\Foundation\Bus\PendingDispatch;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
@@ -14,7 +15,7 @@ use Illuminate\Support\Str;
  *
  * @mixin PendingDispatch
  */
-class ChainGroup
+class ChainGroupJob
 {
     /**
      * @var string
@@ -53,11 +54,26 @@ class ChainGroup
 
     public function dispatch()
     {
-        $this->jobs->map(function ($job) {
-            $groupMemberUuid = Str::uuid();
-            $asyncChainedJob = new AsyncChainedJob($groupMemberUuid, $this->groupUuid, $job);
-            return (new PendingChainGroupMemberDispatch($groupMemberUuid, $this->groupUuid, $asyncChainedJob))->chain($this->chain);
-        })->each(function (PendingChainGroupMemberDispatch $dispatch) {
+        /*
+         * Build the initial chain-group job that will house all the sub jobs
+         */
+        /** @var ChainGroup $chainGroup */
+        $chainGroup = ChainGroup::query()->create();
+        $this->jobs->map(function ($job) use ($chainGroup) {
+
+            /*
+             * Map jobs into PendingDispatches of AsyncChainedJobs
+             */
+            /** @var ChainGroupMember $chainGroupMember */
+            $chainGroupMember = ChainGroupMember::query()->create(['chain_group_id' => $chainGroup->id]);
+            $asyncChainedJob = new AsyncChainedJob($chainGroupMember->id, $chainGroup->id, $job);
+
+            return (new PendingDispatch($asyncChainedJob))->chain($this->chain);
+
+        })->each(function (PendingDispatch $dispatch) {
+            /*
+             * Chain any subsequent method calls from this class to each pending dispatch
+             */
             $this->methodCalls->each(function ($methodCall) use ($dispatch) {
                 $dispatch->{$methodCall['method']}(...$methodCall['arguments']);
             });
@@ -111,9 +127,9 @@ class ChainGroup
 
     /**
      * @param array $jobs
-     * @return ChainGroup
+     * @return ChainGroupJob
      */
-    public function setJobs($jobs): ChainGroup
+    public function setJobs($jobs): ChainGroupJob
     {
         if ($jobs instanceof Collection) {
             $this->jobs = $jobs;
