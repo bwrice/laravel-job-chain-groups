@@ -46,7 +46,7 @@
                 "Bwrice\\LaravelJobChainGroups\\JobChainGroupsServiceProvider"
             ],
             "aliases": {
-                "LaravelJobChainGroups": "Bwrice\\LaravelJobChainGroups\\JobChainGroupsFacade"
+                "JobChainGroups": "Bwrice\\LaravelJobChainGroups\\Facades\\JobChainGroups"
             }
         }
     }
