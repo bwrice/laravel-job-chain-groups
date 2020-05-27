@@ -2,6 +2,7 @@
 
 namespace Bwrice\LaravelJobChainGroups\Tests;
 
+use Bwrice\LaravelJobChainGroups\JobChainGroupsServiceProvider;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 use Orchestra\Testbench\TestCase as Orchestra;
@@ -12,6 +13,7 @@ abstract class TestCase extends Orchestra
     {
         parent::setUp();
         $this->setUpDatabase();
+        $this->app->register(JobChainGroupsServiceProvider::class);
     }
 
     protected function setUpDatabase()
