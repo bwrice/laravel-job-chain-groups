@@ -5,6 +5,7 @@ namespace Bwrice\LaravelJobChainGroups\Tests;
 
 
 use Bwrice\LaravelJobChainGroups\Jobs\AsyncChainedJob;
+use Bwrice\LaravelJobChainGroups\Models\ChainGroup;
 use Bwrice\LaravelJobChainGroups\Models\ChainGroupMember;
 use Bwrice\LaravelJobChainGroups\Tests\TestClasses\Jobs\ProcessOrderItem;
 use Bwrice\LaravelJobChainGroups\Tests\TestClasses\Jobs\ShipOrder;
@@ -20,11 +21,8 @@ class AsyncChainedJobTest extends TestCase
 {
     use DatabaseTransactions;
 
-    /** @var string */
-    public $groupMemberUuid;
-
-    /** @var string */
-    public $groupUuid;
+    /** @var ChainGroup */
+    public $chainGroup;
 
     /** @var ChainGroupMember */
     public $chainGroupMember;
@@ -45,11 +43,9 @@ class AsyncChainedJobTest extends TestCase
     {
         parent::setUp();
 
-        $this->groupMemberUuid = (string) Str::uuid();
-        $this->groupUuid = (string) Str::uuid();
+        $this->chainGroup = ChainGroup::query()->create();
         $this->chainGroupMember = ChainGroupMember::query()->create([
-            'uuid' => $this->groupMemberUuid,
-            'group_uuid' => $this->groupUuid
+            'chain_group_id' => $this->chainGroup->id
         ]);
 
         $this->order = Order::query()->create();
@@ -69,10 +65,10 @@ class AsyncChainedJobTest extends TestCase
     {
         Queue::fake();
 
-        AsyncChainedJob::dispatch($this->groupMemberUuid, $this->groupUuid, $this->decoratedJob);
+        AsyncChainedJob::dispatch($this->chainGroupMember->id, $this->chainGroup->id, $this->decoratedJob);
 
         Queue::assertPushed(AsyncChainedJob::class, function (AsyncChainedJob $job) {
-            return $job->getGroupMemberUuid() === $this->groupMemberUuid;
+            return $job->getChainGroupMemberID() === $this->chainGroupMember->id;
         });
     }
 
@@ -81,12 +77,11 @@ class AsyncChainedJobTest extends TestCase
     */
     public function it_will_set_the_processed_at_column_on_the_chain_group_member()
     {
-        $asyncChainedJob = new AsyncChainedJob($this->groupMemberUuid, $this->groupUuid, $this->decoratedJob);
+        $asyncChainedJob = new AsyncChainedJob($this->chainGroupMember->id, $this->chainGroup->id, $this->decoratedJob);
 
         app(Container::class)->call([$asyncChainedJob, 'handle']);
 
-        $chainGroupMember = ChainGroupMember::query()->find($this->groupMemberUuid);
-        $this->assertNotNull($chainGroupMember);
+        $chainGroupMember = $this->chainGroupMember->fresh();
         $this->assertNotNull($chainGroupMember->processed_at);
     }
 
@@ -100,15 +95,15 @@ class AsyncChainedJobTest extends TestCase
 
         Queue::fake();
 
-        $asyncChainedJob = (new AsyncChainedJob($this->groupMemberUuid, $this->groupUuid, $this->decoratedJob))->chain([
+        $asyncChainedJob = (new AsyncChainedJob($this->chainGroupMember->id, $this->chainGroup->id, $this->decoratedJob))->chain([
             $this->nextJob
         ]);
 
         $asyncChainedJob->dispatchNextJobInChain();
 
-        $unprocessedCount = ChainGroupMember::query()
-            ->where('group_uuid', $this->groupUuid)
-            ->whereNull('processed_at')->count();
+        $unprocessedCount = $this->chainGroup->chainGroupMembers()
+            ->whereNull('processed_at')
+            ->count();
 
         $this->assertEquals(0, $unprocessedCount);
 
@@ -122,25 +117,27 @@ class AsyncChainedJobTest extends TestCase
     */
     public function it_will_NOT_dispatch_the_next_job_if_there_are_members_of_the_group_unprocessed()
     {
-        ChainGroupMember::query()->create([
-            'uuid' => Str::uuid(),
-            'group_uuid' => $this->groupUuid
+        /** @var ChainGroupMember $unProcessedMember */
+        $unProcessedMember = ChainGroupMember::query()->create([
+            'chain_group_id' => $this->chainGroup->id
         ]);
+
+        $this->assertNull($unProcessedMember->processed_at);
 
         Queue::fake();
 
         $this->chainGroupMember->processed_at = Date::now();
         $this->chainGroupMember->save();
 
-        $asyncChainedJob = (new AsyncChainedJob($this->groupMemberUuid, $this->groupUuid, $this->decoratedJob))->chain([
+        $asyncChainedJob = (new AsyncChainedJob($this->chainGroupMember->id, $this->chainGroup->id, $this->decoratedJob))->chain([
             $this->nextJob
         ]);
 
         $asyncChainedJob->dispatchNextJobInChain();
 
-        $unprocessedCount = ChainGroupMember::query()
-            ->where('group_uuid', $this->groupUuid)
-            ->whereNull('processed_at')->count();
+        $unprocessedCount = $this->chainGroup->chainGroupMembers()
+            ->whereNull('processed_at')
+            ->count();
 
         $this->assertEquals(1, $unprocessedCount);
 

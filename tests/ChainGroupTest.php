@@ -5,7 +5,7 @@ namespace Bwrice\LaravelJobChainGroups\Tests;
 
 
 use Bwrice\LaravelJobChainGroups\Jobs\AsyncChainedJob;
-use Bwrice\LaravelJobChainGroups\Jobs\ChainGroup;
+use Bwrice\LaravelJobChainGroups\Jobs\ChainGroupJob;
 use Bwrice\LaravelJobChainGroups\Tests\TestClasses\Jobs\ProcessOrderItem;
 use Bwrice\LaravelJobChainGroups\Tests\TestClasses\Jobs\ShipOrder;
 use Bwrice\LaravelJobChainGroups\Tests\TestClasses\Models\Order;
@@ -50,7 +50,7 @@ class ChainGroupTest extends TestCase
         Queue::fake();
 
         $shipOrderJob = new ShipOrder($this->order);
-        ChainGroup::create([
+        ChainGroupJob::create([
             new ProcessOrderItem($this->itemOne),
             new ProcessOrderItem($this->itemTwo),
             new ProcessOrderItem($this->itemThree)
@@ -79,7 +79,7 @@ class ChainGroupTest extends TestCase
         Queue::fake();
 
         $shipOrderJob = new ShipOrder($this->order);
-        ChainGroup::create([
+        ChainGroupJob::create([
             new ProcessOrderItem($this->itemOne),
         ], [
             $shipOrderJob
