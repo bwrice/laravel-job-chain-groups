@@ -2,6 +2,7 @@
 
 namespace Bwrice\LaravelJobChainGroups;
 
+use Bwrice\LaravelJobChainGroups\Services\JobChainGroups;
 use Illuminate\Support\ServiceProvider;
 
 class JobChainGroupsServiceProvider extends ServiceProvider
@@ -43,8 +44,9 @@ class JobChainGroupsServiceProvider extends ServiceProvider
             // $this->commands([]);
         }
 
-        if (! class_exists('CreateChainGroupMembersTable')) {
+        if (! class_exists('CreateChainGroupsTable') && ! class_exists('CreateChainGroupMembersTable')) {
             $this->publishes([
+                __DIR__.'/../stubs/create_chain_groups_table.stub.php' => database_path('migrations/'.date('Y_m_d_His', time()).'_create_chain_groups_table.php'),
                 __DIR__.'/../stubs/create_chain_group_members_table.stub.php' => database_path('migrations/'.date('Y_m_d_His', time()).'_create_chain_group_members_table.php'),
             ], 'migrations');
         }
