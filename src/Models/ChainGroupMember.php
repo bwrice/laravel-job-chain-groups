@@ -9,19 +9,17 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 
 /**
- * Class ChildJob
+ * Class ChainGroupMember
  * @package Bwrice\LaravelJobChainGroups\models
  *
- * @property string $uuid
- * @property string $group_uuid
+ * @property int $id
+ * @property int $chain_group_id
  * @property CarbonInterface $processed_at
  *
  * @method static Builder unprocessedForGroup(string $groupUuid)
  */
 class ChainGroupMember extends Model
 {
-    public $incrementing = false;
-    protected $primaryKey = 'uuid';
     protected $guarded = [];
     protected $dates = [
         'processed_at',
