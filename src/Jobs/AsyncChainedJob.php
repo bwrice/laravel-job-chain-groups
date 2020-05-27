@@ -10,6 +10,7 @@ use Illuminate\Container\Container;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
+use Illuminate\Queue\Queue;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Facades\DB;
@@ -103,5 +104,21 @@ class AsyncChainedJob implements ShouldQueue
     public function getChainGroupMemberID(): int
     {
         return $this->chainGroupMemberID;
+    }
+
+    /**
+     * Get the display name for the given job.
+     *
+     * @return string
+     *
+     * @see Queue
+     */
+    protected function displayName()
+    {
+        if (is_object($this->decoratedJob)) {
+            return method_exists($this->decoratedJob, 'displayName')
+                ? $this->decoratedJob->displayName() : get_class($this->decoratedJob);
+        }
+        return is_string($this->decoratedJob) ? explode('@', $this->job)[0] : null;
     }
 }
