@@ -18,11 +18,7 @@ use Illuminate\Support\Str;
 class ChainGroupJob
 {
     /**
-     * @var string
-     */
-    protected $groupUuid;
-    /**
-     * @var array
+     * @var Collection
      */
     protected $jobs;
     /**
@@ -33,23 +29,11 @@ class ChainGroupJob
     /** @var Collection */
     protected $methodCalls;
 
-    public function __construct($jobs, array $chain)
+    public function __construct(Collection $jobs, array $chain)
     {
-        if (is_array($jobs)) {
-            $this->jobs = collect($jobs);
-        } elseif ($jobs instanceof Collection) {
-            $this->jobs = $jobs;
-        } else {
-            throw new \InvalidArgumentException("jobs must be an array or instance of " . Collection::class);
-        }
-        $this->groupUuid = Str::uuid();
-        $this->methodCalls = collect();
+        $this->jobs = $jobs;
         $this->chain = $chain;
-    }
-
-    public static function create($jobs, array $chain)
-    {
-        return new static($jobs, $chain);
+        $this->methodCalls = collect();
     }
 
     public function dispatch()
@@ -102,17 +86,9 @@ class ChainGroupJob
     }
 
     /**
-     * @return string
+     * @return Collection
      */
-    public function getGroupUuid(): string
-    {
-        return $this->groupUuid;
-    }
-
-    /**
-     * @return array
-     */
-    public function getJobs(): array
+    public function getJobs()
     {
         return $this->jobs;
     }
