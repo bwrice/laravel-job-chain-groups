@@ -43,6 +43,11 @@ abstract class TestCase extends Orchestra
          * Package Schema
          */
         Schema::dropIfExists('chain_group_members');
+        Schema::dropIfExists('chain_groups');
+
+        include_once __DIR__.'/../stubs/create_chain_groups_table.stub.php';
+        (new \CreateChainGroupsTable())->up();
+
         include_once __DIR__.'/../stubs/create_chain_group_members_table.stub.php';
         (new \CreateChainGroupMembersTable())->up();
 
