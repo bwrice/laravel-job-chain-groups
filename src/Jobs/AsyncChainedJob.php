@@ -68,19 +68,24 @@ class AsyncChainedJob implements ShouldQueue
         if ($unprocessedMembersCount === 0) {
 
             /*
-             * To prevent any race conditions, we'll create a transaction to check the processed_at state of the group,
-             *  and if it's unprocessed, dispatch the next job in the chain, and update the processed_at field
+             * To prevent any race conditions, that could potentially dispatch the next job in the chain twice,
+             * we'll re-query for the chain-group using pessimistic locking and update the processed_at time if null
              */
             DB::transaction(function() use ($chainGroup) {
 
-                $processedAt = $chainGroup->fresh()->processed_at;
-                if (is_null($processedAt)) {
+                /** @var ChainGroup $chainGroup */
+                $chainGroup = ChainGroup::query()
+                    ->find($chainGroup->id)
+                    ->lockForUpdate()
+                    ->first();
+
+                if (is_null($chainGroup->processed_at)) {
 
                     $chainGroup->processed_at = now();
                     $chainGroup->save();
                     $this->illuminateDispatchNextJobInChain();
                 }
-            });
+            }, 5);
         }
     }
 
