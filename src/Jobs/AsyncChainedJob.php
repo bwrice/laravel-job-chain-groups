@@ -113,7 +113,7 @@ class AsyncChainedJob implements ShouldQueue
      *
      * @see Queue
      */
-    protected function displayName()
+    public function displayName()
     {
         if (is_object($this->decoratedJob)) {
             return method_exists($this->decoratedJob, 'displayName')
