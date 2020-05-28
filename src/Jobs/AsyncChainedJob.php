@@ -60,13 +60,11 @@ class AsyncChainedJob implements ShouldQueue
         $unprocessedMembersCount = $chainGroup->chainGroupMembers()
             ->where('processed_at', '=', null)
             ->count();
-
         /*
          * If there are no more un-processed chain group members, this is the last, or, concurrently, one of the lasts
          * async-chain-jobs for that group to be processed
          */
         if ($unprocessedMembersCount === 0) {
-
             /*
              * To prevent any race conditions, that could potentially dispatch the next job in the chain twice,
              * we'll re-query for the chain-group using pessimistic locking and update the processed_at time if null
@@ -75,7 +73,7 @@ class AsyncChainedJob implements ShouldQueue
 
                 /** @var ChainGroup $chainGroup */
                 $chainGroup = ChainGroup::query()
-                    ->find($chainGroup->id)
+                    ->where('id', '=', $chainGroup->id)
                     ->lockForUpdate()
                     ->first();
 
